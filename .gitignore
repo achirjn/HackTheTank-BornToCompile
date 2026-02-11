@@ -1,0 +1,14 @@
+# ===== Backend =====
+backend/target/
+backend/.idea/
+backend/*.log
+
+# ===== Frontend =====
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+
+# ===== General =====
+*.log
+*.class
+.DS_Store
