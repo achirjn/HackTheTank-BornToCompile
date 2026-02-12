@@ -64,13 +64,13 @@ public class SecurityConfig {
             .cors(withDefaults())
             .authorizeHttpRequests(auth -> auth
                 // .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/login/oauth2/**","/auth/**").permitAll()
+                .requestMatchers("/login/oauth2/**", "/auth/**", "/forgotPassword/**", "/resetPassword/**").permitAll()
                 // .anyRequest().permitAll()
                 .anyRequest().authenticated()
                 )
             .csrf(csrf -> csrf.disable())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtValidationFilter, JwtAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(jwtValidationFilter, JwtAuthenticationFilter.class);
         http.oauth2Login(oauth -> {
             // oauth.loginPage("https://www.thinkindiasvnit.in/login");
             oauth.successHandler(oAuthSuccessHandler);

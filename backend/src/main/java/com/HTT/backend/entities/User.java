@@ -30,7 +30,12 @@ public class User implements UserDetails{
     private String name;
     private String email;
     private String password;
+    @Column(nullable=true)
     private String verificationToken;
+    @Column(nullable=true)
+    private String resetPasswordToken;
+    @Column(nullable=true)
+    private LocalDateTime tokenExpirationTime;
     private int accountVerified;
     
     @Column(columnDefinition = "TINYINT(1)")
@@ -83,11 +88,12 @@ public class User implements UserDetails{
         this.accountVerified = accountVerified;
         this.adminPermit = false;
     }
-    public User(String name, String email,String password, boolean adminPermit) {
+    public User(String name, String email,String password, boolean adminPermit, int accountVerified) {
         this.adminPermit = adminPermit;
         this.email = email;
         this.name = name;
         this.password = password;
+        this.accountVerified = accountVerified;
     }
 
     @Override

@@ -50,7 +50,7 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
             if (user == null) {
                 System.out.println("new user");
                 String encodedPassword = passwordEncoder.encode("gw(8ehnbeiub*(*7766hspoiaw)(^6sa5&s*%78iofgwskl23gs");
-                user = new User(name, email, encodedPassword, email.equals("achirjain11@gmail.com"));
+                user = new User(name, email, encodedPassword, email.equals("achirjain11@gmail.com"), 1);
                 user = userService.saveUser(user);
                 System.out.println("saved user: " + user);
             }

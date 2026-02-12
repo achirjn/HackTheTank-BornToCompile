@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.HTT.backend.dto.UserDto;
 import com.HTT.backend.entities.User;
-import com.HTT.backend.helper.RandomStringGenerator;
+import com.HTT.backend.helper.RandomGenerator;
 import com.HTT.backend.services.UserService;
 import com.HTT.backend.services.impl.EmailSender;
 
@@ -45,7 +45,7 @@ public class UserAuthController {
         }
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         if(user==null){
-            RandomStringGenerator randomStringGenerator = new RandomStringGenerator();
+            RandomGenerator randomStringGenerator = new RandomGenerator();
             String verificationToken = randomStringGenerator.generateRandomString(7);
             user = new User(userDto.getName(), userDto.getEmail(), encodedPassword,verificationToken, 0);
             //send verification email
@@ -70,7 +70,7 @@ public class UserAuthController {
             return new ResponseEntity<>("User already exists with this account. Try login.",HttpStatus.BAD_REQUEST);
         }
         else{
-            RandomStringGenerator randomStringGenerator = new RandomStringGenerator();
+            RandomGenerator randomStringGenerator = new RandomGenerator();
             String verificationToken = randomStringGenerator.generateRandomString(7);
             user.setName(userDto.getName());
             user.setPassword(encodedPassword);
@@ -106,9 +106,12 @@ public class UserAuthController {
         }
         user.setAccountVerified(1);
         user.setLastActive(LocalDateTime.now());
+        user.setVerificationToken(null);
         userService.saveUser(user);
         return new ResponseEntity<>("<h1>Account verified successfully.</h1>",HttpStatus.OK);
     }
+
+    
     
 }
 
