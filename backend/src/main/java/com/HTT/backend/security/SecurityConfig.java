@@ -3,6 +3,7 @@ package com.HTT.backend.security;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,8 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    @Value("${frontend.base.url}")
+    private String frontendUrl;
 
 
     public SecurityConfig(OAuthAuthenticationSuccessHandler oAuthSuccessHandler, UserDetailsService userDetailsService, JwtUtil jwtUtil, UserService userService){
@@ -72,7 +75,7 @@ public class SecurityConfig {
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(jwtValidationFilter, JwtAuthenticationFilter.class);
         http.oauth2Login(oauth -> {
-            // oauth.loginPage("https://www.thinkindiasvnit.in/login");
+            oauth.loginPage(frontendUrl + "/login");
             oauth.successHandler(oAuthSuccessHandler);
         });
         return http.build();
@@ -83,7 +86,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         
         // This is the origin of your React app
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8082")); 
+        configuration.setAllowedOrigins(Arrays.asList(frontendUrl)); 
         
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));

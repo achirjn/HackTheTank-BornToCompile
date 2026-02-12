@@ -2,6 +2,7 @@ package com.HTT.backend.controllers;
 
 import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,6 +29,9 @@ public class UserAuthController {
     private UserService userService;
     private EmailSender emailSender;
 
+    @Value("${frontend.base.url}")      
+    private String frontendUrl;
+
     public UserAuthController(PasswordEncoder passwordEncoder, UserService userService, EmailSender emailSender) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
@@ -49,21 +53,21 @@ public class UserAuthController {
             String verificationToken = randomStringGenerator.generateRandomString(7);
             user = new User(userDto.getName(), userDto.getEmail(), encodedPassword,verificationToken, 0);
             //send verification email
-            String subject = "Verify Your Email to Complete Login – Think India SVNIT";
+            String subject = "Verify Your Email to Complete Login – Company Name";
             String content = new String(
                 "Hello "+userDto.getName()+",\n" + //
                 "\n" + //
-                                "We noticed a login attempt to your Think India SVNIT account.\n" + //
+                                "We noticed a login attempt to your Company Name account.\n" + //
                                 "To keep your account secure, please verify your email by clicking the button below:\n" + //
                                 "\n" + //
-                                "http://localhost:8082/auth/verifyEmail/"+userDto.getEmail()+"/"+verificationToken+"\n" + //verificatoin link
+                                frontendUrl + "/auth/verifyEmail/"+userDto.getEmail()+"/"+verificationToken+"\n" + //verificatoin link
                                 "\n" + //
                                 "If you did not attempt to log in, you can safely ignore this email.\n" + //
                                 "\n" + //
-                                "Thank you for being part of Think India SVNIT.\n" + //
+                                "Thank you for being part of Company Name.\n" + //
                                 "\n" + //
                                 "Warm regards,\n" + //
-                                "Team Think India SVNIT");
+                                "Team Company Name");
                                 emailSender.sendEmail(userDto.getEmail(), subject, content);
         }
         else if(user!=null && user.getAccountVerified()==1){
@@ -76,21 +80,21 @@ public class UserAuthController {
             user.setPassword(encodedPassword);
             user.setVerificationToken(verificationToken);
             //send verification email
-            String subject = "Verify Your Email to Complete Login – Think India SVNIT";
+            String subject = "Verify Your Email to Complete Login – Company Name";
             String content = new String(
                                 "Hello "+userDto.getName()+",\n" + //
                                 "\n" + //
-                                "We noticed a login attempt to your Think India SVNIT account.\n" + //
+                                "We noticed a login attempt to your Company Name account.\n" + //
                                 "To keep your account secure, please verify your email by clicking the button below:\n" + //
                                 "\n" + //
-                                "http://localhost:8082/auth/verifyEmail/"+userDto.getEmail()+"/"+verificationToken+"\n" + //verificatoin link
+                                frontendUrl + "/verifyEmail/"+userDto.getEmail()+"/"+verificationToken+"\n" + //verificatoin link
                                 "\n" + //
                                 "If you did not attempt to log in, you can safely ignore this email.\n" + //
                                 "\n" + //
-                                "Thank you for being part of Think India SVNIT.\n" + //
+                                "Thank you for being part of Company Name.\n" + //
                                 "\n" + //
                                 "Warm regards,\n" + //
-                                "Team Think India SVNIT");
+                                "Team Company Name");
             emailSender.sendEmail(userDto.getEmail(), subject, content);
         }
         userService.saveUser(user);
@@ -108,7 +112,7 @@ public class UserAuthController {
         user.setLastActive(LocalDateTime.now());
         user.setVerificationToken(null);
         userService.saveUser(user);
-        return new ResponseEntity<>("<h1>Account verified successfully.</h1>",HttpStatus.OK);
+        return new ResponseEntity<>("Account verified successfully.",HttpStatus.OK);
     }
 
     

@@ -40,7 +40,7 @@ public class User implements UserDetails{
     private LocalDateTime tokenExpirationTime;
     private int accountVerified;
     
-    @Column(columnDefinition = "TINYINT(1)")
+    @Column(columnDefinition = "SMALLINT DEFAULT 0")
     private boolean adminPermit;
 
     private LocalDateTime lastActive;

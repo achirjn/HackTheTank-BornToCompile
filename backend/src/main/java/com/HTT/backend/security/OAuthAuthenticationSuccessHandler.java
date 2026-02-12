@@ -2,6 +2,7 @@ package com.HTT.backend.security;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +26,9 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
     private UserService userService;
     private JwtUtil jwtUtil;
     private PasswordEncoder passwordEncoder;
+    
+    @Value("${frontend.base.url}")
+    private String frontendUrl;
 
     public OAuthAuthenticationSuccessHandler(JwtUtil jwtUtil,@Lazy PasswordEncoder passwwEncoder, UserService userService) {
         this.jwtUtil = jwtUtil;
@@ -59,7 +63,7 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
             boolean isAdmin = user.getAuthorities().stream()
                     .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 
-            String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:8082/loginsuccess")
+            String redirectUrl = UriComponentsBuilder.fromUriString(frontendUrl)
                     .queryParam("token", jwtToken)
                     .queryParam("isAdmin", isAdmin)
                     .build().toUriString();
@@ -74,7 +78,7 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
             e.printStackTrace(); // This prints the full error stack trace to the log
 
             // Redirect to a generic error page so the user isn't stuck
-            String errorUrl = UriComponentsBuilder.fromUriString("http://localhost:8082/loginfailed")
+            String errorUrl = UriComponentsBuilder.fromUriString(frontendUrl+"/login")
                     .queryParam("error", "LoginProcessingFailed")
                     .build().toUriString();
             new DefaultRedirectStrategy().sendRedirect(request, response, errorUrl);
