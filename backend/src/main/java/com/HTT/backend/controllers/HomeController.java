@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
-    @GetMapping("/home")
+    @GetMapping("/health")
     public ResponseEntity<?> getMethodName() {
-        return new ResponseEntity("you are home",HttpStatus.OK);
+        return new ResponseEntity("working fine",HttpStatus.OK);
     }
     @GetMapping("/loginsuccess")
     public ResponseEntity<?> getLoginSuccess() {
