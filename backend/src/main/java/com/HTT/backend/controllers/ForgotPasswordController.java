@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.HTT.backend.entities.User;
 import com.HTT.backend.helper.RandomGenerator;
@@ -18,7 +18,7 @@ import com.HTT.backend.services.impl.EmailSender;
 
 import jakarta.servlet.http.HttpSession;
 
-@Controller
+@RestController
 public class ForgotPasswordController {
 
     private PasswordEncoder passwordEncoder;

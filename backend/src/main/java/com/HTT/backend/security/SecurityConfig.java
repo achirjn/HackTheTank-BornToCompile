@@ -75,7 +75,7 @@ public class SecurityConfig {
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(jwtValidationFilter, JwtAuthenticationFilter.class);
         http.oauth2Login(oauth -> {
-            oauth.loginPage(frontendUrl + "/login");
+            // oauth.loginPage(frontendUrl + "/login");
             oauth.successHandler(oAuthSuccessHandler);
         });
         return http.build();
