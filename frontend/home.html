@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - HTT</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="home-container">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <h2>HTT</h2>
+            </div>
+            <div class="navbar-menu">
+                <ul>
+                    <li><a href="#" class="active">Dashboard</a></li>
+                    <li><a href="#">Profile</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </div>
+            <div class="navbar-user">
+                <span id="userEmail"></span>
+                <button onclick="handleLogout()" class="logout-btn">Logout</button>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <div class="welcome-section">
+                <h1>Welcome to HTT Dashboard</h1>
+                <p>Hello, <span id="userName">User</span>! You're successfully logged in.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <h3>Analytics</h3>
+                    <p>View your analytics and performance metrics</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">⚙️</div>
+                    <h3>Settings</h3>
+                    <p>Manage your account and preferences</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">👥</div>
+                    <h3>Profile</h3>
+                    <p>Update your profile information</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">📞</div>
+                    <h3>Support</h3>
+                    <p>Get help from our support team</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
