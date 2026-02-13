@@ -20,33 +20,33 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @NoArgsConstructor
 @Getter
 @Setter
 @AllArgsConstructor
-public class User implements UserDetails{
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     private String email;
     private String password;
-    @Column(nullable=true)
+    @Column(nullable = true)
     private String verificationToken;
-    @Column(nullable=true)
+    @Column(nullable = true)
     private String resetPasswordToken;
-    @Column(nullable=true)
+    @Column(nullable = true)
     private LocalDateTime tokenExpirationTime;
     private int accountVerified;
-    
-    @Column(columnDefinition = "SMALLINT DEFAULT 0")
-    private boolean adminPermit;
+
+    @Column(nullable = false)
+    private Boolean adminPermit = false;
 
     private LocalDateTime lastActive;
-    @Column(nullable=true)
+    @Column(nullable = true)
     private String imageUrl;
-    
+
     // @OneToOne(cascade=CascadeType.ALL, orphanRemoval = true)
     // @JoinColumn(name="resume_id",referencedColumnName="id")
     // private ResumeCV resumeCV;
@@ -56,16 +56,16 @@ public class User implements UserDetails{
 
     // @OneToMany(mappedBy="user")
     // private List<EventRegistration> registeredEvents;
-    
 
-    public User(String name, String email, String password, int accountVerified){
+    public User(String name, String email, String password, int accountVerified) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.adminPermit = false;
         this.accountVerified = accountVerified;
     }
-    public User(String name, String email, String password,String verificationToken, int accountVerified){
+
+    public User(String name, String email, String password, String verificationToken, int accountVerified) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -73,6 +73,7 @@ public class User implements UserDetails{
         this.adminPermit = false;
         this.accountVerified = accountVerified;
     }
+
     public User(int id, String name, String email, String password, int accountVerified) {
         this.id = id;
         this.name = name;
@@ -81,7 +82,8 @@ public class User implements UserDetails{
         this.accountVerified = accountVerified;
         this.adminPermit = false;
     }
-    public User(int id, String name, String email, String password,String verificationToken, int accountVerified) {
+
+    public User(int id, String name, String email, String password, String verificationToken, int accountVerified) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -90,7 +92,8 @@ public class User implements UserDetails{
         this.accountVerified = accountVerified;
         this.adminPermit = false;
     }
-    public User(String name, String email,String password, boolean adminPermit, int accountVerified) {
+
+    public User(String name, String email, String password, boolean adminPermit, int accountVerified) {
         this.adminPermit = adminPermit;
         this.email = email;
         this.name = name;
@@ -101,10 +104,10 @@ public class User implements UserDetails{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (this.adminPermit) {
-        return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-    } else {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-    }
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else {
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        }
     }
 
     @Override
@@ -112,4 +115,3 @@ public class User implements UserDetails{
         return this.email;
     }
 }
-
