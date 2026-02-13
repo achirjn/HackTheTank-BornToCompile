@@ -20,17 +20,15 @@ import com.HTT.backend.helper.RandomGenerator;
 import com.HTT.backend.services.UserService;
 import com.HTT.backend.services.impl.EmailSender;
 
-
-
 @RestController
 @RequestMapping("/auth")
 public class UserAuthController {
-    
+
     private PasswordEncoder passwordEncoder;
     private UserService userService;
     private EmailSender emailSender;
 
-    @Value("${frontend.base.url}")      
+    @Value("${frontend.base.url}")
     private String frontendUrl;
 
     public UserAuthController(PasswordEncoder passwordEncoder, UserService userService, EmailSender emailSender) {
@@ -39,9 +37,10 @@ public class UserAuthController {
         this.emailSender = emailSender;
     }
 
-
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
+        System.out.println("REGISTER ENDPOINT HIT");
+        System.out.println("Email: " + userDto.getEmail());
         User user;
         try {
             user = (User) userService.loadUserByUsername(userDto.getEmail());
@@ -99,24 +98,21 @@ public class UserAuthController {
             emailSender.sendEmail(userDto.getEmail(), subject, content);
         }
         userService.saveUser(user);
+        System.out.println("USER SAVE CALLED");
         return new ResponseEntity<>("Verification email sent, please check.", HttpStatus.OK);
     }
-                        
-                        
+
     @GetMapping("/verifyEmail/{email}/{token}")
     public ResponseEntity<?> getMethodName(@PathVariable("email") String email, @PathVariable("token") String token) {
-        User user = (User)userService.loadUserByUsername(email);
-        if( !user.getVerificationToken().equals(token)){
+        User user = (User) userService.loadUserByUsername(email);
+        if (!user.getVerificationToken().equals(token)) {
             return new ResponseEntity<>("<h1>Wrong Token.Please try signup again.</h1>", HttpStatus.BAD_REQUEST);
         }
         user.setAccountVerified(1);
         user.setLastActive(LocalDateTime.now());
         user.setVerificationToken(null);
         userService.saveUser(user);
-        return new ResponseEntity<>("Account verified successfully.",HttpStatus.OK);
+        return new ResponseEntity<>("Account verified successfully.", HttpStatus.OK);
     }
 
-    
-    
 }
-

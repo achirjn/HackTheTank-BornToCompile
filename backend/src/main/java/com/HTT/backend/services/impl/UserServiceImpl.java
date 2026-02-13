@@ -11,7 +11,7 @@ import com.HTT.backend.repositories.UserRepo;
 import com.HTT.backend.services.UserService;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepo userRepository;
@@ -27,7 +27,10 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User saveUser(User user) {
-        return userRepository.save(user);
+        System.out.println("About to save user to DB");
+        User saved = userRepository.save(user);
+        System.out.println("User saved with ID: " + saved.getId());
+        return saved;
     }
 
     @Override
@@ -35,6 +38,4 @@ public class UserServiceImpl implements UserService{
         return userRepository.findByResetPasswordToken(token).orElse(null);
     }
 
-
 }
-
