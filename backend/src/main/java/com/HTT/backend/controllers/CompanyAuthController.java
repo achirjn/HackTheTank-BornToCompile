@@ -14,53 +14,53 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.HTT.backend.dto.UserDto;
-import com.HTT.backend.entities.User;
+import com.HTT.backend.dto.CompanyDto;
+import com.HTT.backend.entities.Company;
 import com.HTT.backend.helper.RandomGenerator;
-import com.HTT.backend.services.UserService;
+import com.HTT.backend.services.CompanyService;
 import com.HTT.backend.services.impl.EmailSender;
 
 @RestController
 @RequestMapping("/auth")
-public class UserAuthController {
+public class CompanyAuthController {
 
     private PasswordEncoder passwordEncoder;
-    private UserService userService;
+    private CompanyService companyService;
     private EmailSender emailSender;
 
     @Value("${frontend.base.url}")
     private String frontendUrl;
 
-    public UserAuthController(PasswordEncoder passwordEncoder, UserService userService, EmailSender emailSender) {
+    public CompanyAuthController(PasswordEncoder passwordEncoder, CompanyService companyService, EmailSender emailSender) {
         this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
+        this.companyService = companyService;
         this.emailSender = emailSender;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<?> registerCompany(@RequestBody CompanyDto companyDto) {
         System.out.println("REGISTER ENDPOINT HIT");
-        System.out.println("Email: " + userDto.getEmail());
-        User user;
+        System.out.println("Email: " + companyDto.getEmail());
+        Company company;
         try {
-            user = (User) userService.loadUserByUsername(userDto.getEmail());
+            company = (Company) companyService.loadUserByUsername(companyDto.getEmail());
         } catch (UsernameNotFoundException e) {
-            user = null;
+            company = null;
         }
-        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
-        if(user==null){
+        String encodedPassword = passwordEncoder.encode(companyDto.getPassword());
+        if(company==null){
             RandomGenerator randomStringGenerator = new RandomGenerator();
             String verificationToken = randomStringGenerator.generateRandomString(7);
-            user = new User(userDto.getName(), userDto.getEmail(), encodedPassword,verificationToken, 0);
+            company = new Company(companyDto.getName(), companyDto.getEmail(), encodedPassword, verificationToken, 0);
             //send verification email
             String subject = "Verify Your Email to Complete Login – Company Name";
             String content = new String(
-                "Hello "+userDto.getName()+",\n" + //
+                "Hello "+companyDto.getName()+",\n" + //
                 "\n" + //
                                 "We noticed a login attempt to your Company Name account.\n" + //
                                 "To keep your account secure, please verify your email by clicking the button below:\n" + //
                                 "\n" + //
-                                frontendUrl + "/auth/verifyEmail/"+userDto.getEmail()+"/"+verificationToken+"\n" + //verificatoin link
+                                frontendUrl + "/auth/verifyEmail/"+companyDto.getEmail()+"/"+verificationToken+"\n" + //verificatoin link
                                 "\n" + //
                                 "If you did not attempt to log in, you can safely ignore this email.\n" + //
                                 "\n" + //
@@ -68,26 +68,26 @@ public class UserAuthController {
                                 "\n" + //
                                 "Warm regards,\n" + //
                                 "Team Company Name");
-                                emailSender.sendEmail(userDto.getEmail(), subject, content);
+                                emailSender.sendEmail(companyDto.getEmail(), subject, content);
         }
-        else if(user!=null && user.getAccountVerified()==1){
-            return new ResponseEntity<>("User already exists with this account. Try login.",HttpStatus.BAD_REQUEST);
+        else if(company!=null && company.getAccountVerified()==1){
+            return new ResponseEntity<>("Company already exists with this account. Try login.",HttpStatus.BAD_REQUEST);
         }
         else{
             RandomGenerator randomStringGenerator = new RandomGenerator();
             String verificationToken = randomStringGenerator.generateRandomString(7);
-            user.setName(userDto.getName());
-            user.setPassword(encodedPassword);
-            user.setVerificationToken(verificationToken);
+            company.setName(companyDto.getName());
+            company.setPassword(encodedPassword);
+            company.setVerificationToken(verificationToken);
             //send verification email
             String subject = "Verify Your Email to Complete Login – Company Name";
             String content = new String(
-                                "Hello "+userDto.getName()+",\n" + //
+                                "Hello "+companyDto.getName()+",\n" + //
                                 "\n" + //
                                 "We noticed a login attempt to your Company Name account.\n" + //
                                 "To keep your account secure, please verify your email by clicking the button below:\n" + //
                                 "\n" + //
-                                frontendUrl + "/verifyEmail/"+userDto.getEmail()+"/"+verificationToken+"\n" + //verificatoin link
+                                frontendUrl + "/verifyEmail/"+companyDto.getEmail()+"/"+verificationToken+"\n" + //verificatoin link
                                 "\n" + //
                                 "If you did not attempt to log in, you can safely ignore this email.\n" + //
                                 "\n" + //
@@ -95,23 +95,23 @@ public class UserAuthController {
                                 "\n" + //
                                 "Warm regards,\n" + //
                                 "Team Company Name");
-            emailSender.sendEmail(userDto.getEmail(), subject, content);
+            emailSender.sendEmail(companyDto.getEmail(), subject, content);
         }
-        userService.saveUser(user);
-        System.out.println("USER SAVE CALLED");
+        companyService.saveCompany(company);
+        System.out.println("COMPANY SAVE CALLED");
         return new ResponseEntity<>("Verification email sent, please check.", HttpStatus.OK);
     }
 
     @GetMapping("/verifyEmail/{email}/{token}")
-    public ResponseEntity<?> getMethodName(@PathVariable("email") String email, @PathVariable("token") String token) {
-        User user = (User) userService.loadUserByUsername(email);
-        if (!user.getVerificationToken().equals(token)) {
+    public ResponseEntity<?> verifyEmail(@PathVariable("email") String email, @PathVariable("token") String token) {
+        Company company = (Company) companyService.loadUserByUsername(email);
+        if (!company.getVerificationToken().equals(token)) {
             return new ResponseEntity<>("<h1>Wrong Token.Please try signup again.</h1>", HttpStatus.BAD_REQUEST);
         }
-        user.setAccountVerified(1);
-        user.setLastActive(LocalDateTime.now());
-        user.setVerificationToken(null);
-        userService.saveUser(user);
+        company.setAccountVerified(1);
+        company.setLastActive(LocalDateTime.now());
+        company.setVerificationToken(null);
+        companyService.saveCompany(company);
         return new ResponseEntity<>("Account verified successfully.", HttpStatus.OK);
     }
 

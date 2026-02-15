@@ -20,7 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.HTT.backend.services.UserService;
+import com.HTT.backend.services.CompanyService;
 
 @Configuration
 public class SecurityConfig {
@@ -28,16 +28,16 @@ public class SecurityConfig {
     private final OAuthAuthenticationSuccessHandler oAuthSuccessHandler;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
-    private final UserService userService;
+    private final CompanyService companyService;
     @Value("${frontend.base.url}")
     private String frontendUrl;
 
 
-    public SecurityConfig(OAuthAuthenticationSuccessHandler oAuthSuccessHandler, UserDetailsService userDetailsService, JwtUtil jwtUtil, UserService userService){
+    public SecurityConfig(OAuthAuthenticationSuccessHandler oAuthSuccessHandler, UserDetailsService userDetailsService, JwtUtil jwtUtil, CompanyService companyService){
     this.oAuthSuccessHandler = oAuthSuccessHandler;
        this.jwtUtil=jwtUtil;
        this.userDetailsService=userDetailsService;
-       this.userService = userService;
+       this.companyService = companyService;
     }
 
     @Bean
@@ -61,15 +61,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, JwtUtil jwtUtil) throws Exception{
-        JwtAuthenticationFilter jwtAuthFilter = new JwtAuthenticationFilter(authenticationManager, jwtUtil, userService);
+        JwtAuthenticationFilter jwtAuthFilter = new JwtAuthenticationFilter(authenticationManager, jwtUtil, companyService);
         JwtValidationFilter jwtValidationFilter = new JwtValidationFilter(authenticationManager);
         http
             .cors(withDefaults())
             .authorizeHttpRequests(auth -> auth
                 // .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/health", "/login/oauth2/**", "/auth/**", "/forgotPassword/**", "/resetPassword/**").permitAll()
-                // .anyRequest().permitAll()
-                .anyRequest().authenticated()
+                // .requestMatchers("/health", "/login/oauth2/**", "/auth/**", "/forgotPassword/**", "/resetPassword/**").permitAll()
+                .anyRequest().permitAll()
+                // .anyRequest().authenticated()
                 )
             .csrf(csrf -> csrf.disable())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

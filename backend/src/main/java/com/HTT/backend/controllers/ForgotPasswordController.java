@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.HTT.backend.entities.User;
+import com.HTT.backend.entities.Company;
 import com.HTT.backend.helper.RandomGenerator;
-import com.HTT.backend.services.UserService;
+import com.HTT.backend.services.CompanyService;
 import com.HTT.backend.services.impl.EmailSender;
 
 import jakarta.servlet.http.HttpSession;
@@ -22,29 +22,29 @@ import jakarta.servlet.http.HttpSession;
 public class ForgotPasswordController {
 
     private PasswordEncoder passwordEncoder;
-    private UserService userService;
+    private final CompanyService companyService;
     private EmailSender emailSender;
     @Value("${frontend.base.url}")
     private String frontendBaseUrl;
 
-    public ForgotPasswordController(PasswordEncoder passwordEncoder, UserService userService, EmailSender emailSender) {
+    public ForgotPasswordController(PasswordEncoder passwordEncoder, CompanyService companyService, EmailSender emailSender) {
         this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
+        this.companyService = companyService;
         this.emailSender = emailSender;
     }
 
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@RequestParam("email") String email, HttpSession session) {
-        User user;
+        Company company;
         try {
-            user = (User) userService.loadUserByUsername(email);
+            company = (Company) companyService.loadUserByUsername(email);
         } catch (UsernameNotFoundException e) {
-            return new ResponseEntity<>("No user found with this email.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("No company found with this email.", HttpStatus.BAD_REQUEST);
         }
         String token = RandomGenerator.generateRandomString(10);
         String subject = "Password Reset Link for Think India SVNIT";
         String content = new String(
-                "Hello " + user.getName() + ",\n" + //
+                "Hello " + company.getName() + ",\n" + //
                         "\n" + //
                         "We received a request to reset your password for your Think India SVNIT account.\n" + //
                         "To proceed with resetting your password, please click the following link:\n" + //
@@ -59,9 +59,9 @@ public class ForgotPasswordController {
                         "Warm regards,\n" + //
                         "Team Think India SVNIT");
         emailSender.sendEmail(email, subject, content);
-        user.setResetPasswordToken(token);
-        user.setTokenExpirationTime(LocalDateTime.now().plusMinutes(10));
-        userService.saveUser(user);
+        company.setResetPasswordToken(token);
+        company.setTokenExpirationTime(LocalDateTime.now().plusMinutes(10));
+        companyService.saveCompany(company);
         return new ResponseEntity<>("Password reset link sent to your email, please check.", HttpStatus.OK);
     }
 
@@ -70,17 +70,17 @@ public class ForgotPasswordController {
             @RequestParam String token,
             @RequestParam String newPassword) {
 
-        User user = userService.findByResetPasswordToken(token);
+        Company company = companyService.findByResetPasswordToken(token);
 
-        if (user == null ||
-                user.getTokenExpirationTime().isBefore(LocalDateTime.now())) {
+        if (company == null ||
+                company.getTokenExpirationTime().isBefore(LocalDateTime.now())) {
             return new ResponseEntity<>("Invalid or expired token", HttpStatus.BAD_REQUEST);
         }
 
-        user.setPassword(passwordEncoder.encode(newPassword));
-        user.setResetPasswordToken(null);
-        user.setTokenExpirationTime(null);
-        userService.saveUser(user);
+        company.setPassword(passwordEncoder.encode(newPassword));
+        company.setResetPasswordToken(null);
+        company.setTokenExpirationTime(null);
+        companyService.saveCompany(company);
 
         return ResponseEntity.ok("Password updated successfully");
     }

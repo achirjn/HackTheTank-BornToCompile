@@ -11,8 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.HTT.backend.entities.User;
-import com.HTT.backend.services.UserService;
+import com.HTT.backend.entities.Company;
+import com.HTT.backend.services.CompanyService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,12 +24,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private UserService userService;
+    private final CompanyService companyService;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserService userService){
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CompanyService companyService){
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
-        this.userService = userService;
+        this.companyService = companyService;
     }
 
     @Override
@@ -54,10 +54,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         if (authResult.isAuthenticated()) {
             // Generate the JWT, including the user's roles.
             String token = jwtUtil.generateToken(authResult.getName(), authResult.getAuthorities(), 30);
-            User user = (User) userService.loadUserByUsername(email);
-            if(user.getAccountVerified()==0) throw new BadCredentialsException("Account not verified.");
-            user.setLastActive(LocalDateTime.now());
-            userService.saveUser(user);
+            Company company = (Company) companyService.loadUserByUsername(email);
+            if(company.getAccountVerified()==0) throw new BadCredentialsException("Account not verified.");
+            company.setLastActive(LocalDateTime.now());
+            companyService.saveCompany(company);
 
             // Check if the user has the "ROLE_ADMIN" authority.
             boolean isAdmin = authResult.getAuthorities().stream()

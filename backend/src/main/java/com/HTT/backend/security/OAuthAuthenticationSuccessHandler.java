@@ -13,8 +13,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.HTT.backend.entities.User;
-import com.HTT.backend.services.UserService;
+import com.HTT.backend.entities.Company;
+import com.HTT.backend.services.CompanyService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,16 +23,16 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private UserService userService;
+    private final CompanyService companyService;
     private JwtUtil jwtUtil;
     private PasswordEncoder passwordEncoder;
     
     @Value("${frontend.base.url}")
     private String frontendUrl;
 
-    public OAuthAuthenticationSuccessHandler(JwtUtil jwtUtil,@Lazy PasswordEncoder passwwEncoder, UserService userService) {
+    public OAuthAuthenticationSuccessHandler(JwtUtil jwtUtil,@Lazy PasswordEncoder passwwEncoder, CompanyService companyService) {
         this.jwtUtil = jwtUtil;
-        this.userService = userService;
+        this.companyService = companyService;
         this.passwordEncoder = passwwEncoder;
     }
 
@@ -45,22 +45,22 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
             String email = oAuthUser.getAttribute("email").toString();
             System.out.println(name + "  " + email);
 
-            User user;
+            Company company;
             try {
-                user = (User) userService.loadUserByUsername(email);
+                company = (Company) companyService.loadUserByUsername(email);
             } catch (UsernameNotFoundException e) {
-                user = null;
+                company = null;
             }
-            if (user == null) {
-                System.out.println("new user");
+            if (company == null) {
+                System.out.println("new company");
                 String encodedPassword = passwordEncoder.encode("gw(8ehnbeiub*(*7766hspoiaw)(^6sa5&s*%78iofgwskl23gs");
-                user = new User(name, email, encodedPassword, email.equals("achirjain11@gmail.com"), 1);
-                user = userService.saveUser(user);
-                System.out.println("saved user: " + user);
+                company = new Company(name, email, encodedPassword, email.equals("achirjain11@gmail.com"), 1);
+                company = companyService.saveCompany(company);
+                System.out.println("saved company: " + company);
             }
-            String jwtToken = jwtUtil.generateToken(user.getEmail(), user.getAuthorities(), 15L);
+            String jwtToken = jwtUtil.generateToken(company.getEmail(), company.getAuthorities(), 15L);
             System.out.println("token: " + jwtToken);
-            boolean isAdmin = user.getAuthorities().stream()
+            boolean isAdmin = company.getAuthorities().stream()
                     .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 
             String redirectUrl = UriComponentsBuilder.fromUriString(frontendUrl)
